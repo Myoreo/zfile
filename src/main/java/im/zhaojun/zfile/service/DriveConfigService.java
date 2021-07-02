@@ -21,8 +21,6 @@ import im.zhaojun.zfile.service.base.AbstractBaseFileService;
 import im.zhaojun.zfile.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,8 +65,7 @@ public class DriveConfigService {
      * @return  驱动器列表
      */
     public List<DriveConfig> list() {
-        Sort sort = new Sort(Sort.Direction.ASC,"orderNum");
-        return driverConfigRepository.findAll(sort);
+        return driverConfigRepository.findAll(null);
     }
 
 
@@ -78,11 +75,7 @@ public class DriveConfigService {
      * @return  已启用的驱动器列表
      */
     public List<DriveConfig> listOnlyEnable() {
-        DriveConfig driveConfig = new DriveConfig();
-        driveConfig.setEnable(true);
-        Example<DriveConfig> example = Example.of(driveConfig);
-        Sort sort = new Sort(Sort.Direction.ASC,"orderNum");
-        return driverConfigRepository.findAll(example, sort);
+        return driverConfigRepository.findAll(1);
     }
 
 
@@ -95,7 +88,8 @@ public class DriveConfigService {
      * @return  驱动器设置
      */
     public DriveConfig findById(Integer id) {
-        return driverConfigRepository.findById(id).orElse(null);
+        DriveConfig driveConfig = driverConfigRepository.findById(id);
+        return driveConfig;
     }
 
 
@@ -108,7 +102,7 @@ public class DriveConfigService {
      * @return  驱动器 DTO
      */
     public DriveConfigDTO findDriveConfigDTOById(Integer id) {
-        DriveConfig driveConfig = driverConfigRepository.getOne(id);
+        DriveConfig driveConfig = driverConfigRepository.findById(id);
 
         DriveConfigDTO driveConfigDTO = new DriveConfigDTO();
 
@@ -153,7 +147,7 @@ public class DriveConfigService {
      * @return  驱动器对应的存储策略.
      */
     public StorageTypeEnum findStorageTypeById(Integer id) {
-        return driverConfigRepository.findById(id).get().getType();
+        return driverConfigRepository.findById(id).getType();
     }
 
 
@@ -212,6 +206,7 @@ public class DriveConfigService {
             }
 
         }
+        for()
         storageConfigRepository.saveAll(storageConfigList);
 
         driveContext.init(driveConfig.getId());

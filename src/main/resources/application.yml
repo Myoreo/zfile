@@ -31,7 +31,7 @@ zfile:
     scope: offline_access User.Read Files.ReadWrite.All
 
 server:
-  port: 8080
+  port: 9080
   servlet:
     context-path: ''
   tomcat:
@@ -40,12 +40,12 @@ server:
     enabled: true
 
 spring:
-  h2:
-    console:
-      settings:
-        web-allow-others: true
-      path: /h2-console
-      enabled: ${zfile.debug}
+  #h2:
+    #console:
+      #settings:
+        #web-allow-others: true
+      #path: /h2-console
+      #enabled: ${zfile.debug}
   datasource:
     # 初始化数据导入
     data: classpath*:db/data.sql
@@ -55,26 +55,29 @@ spring:
     continue-on-error: true
 
     # h2 内存数据库 配置
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:${zfile.db.path}
-    username: zfile
-    password: 123456
+    #driver-class-name: org.h2.Driver
+    #url: jdbc:h2:${zfile.db.path}
+    #username: zfile
+    #password: 123456
 
     # MySQL 配置
-  #    driver-class-name: com.mysql.jdbc.Driver
-  #    url: jdbc:mysql://127.0.0.1:3306/zfile?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
-  #    username: root
-  #    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://sh-cynosdbmysql-grp-ehos6x8c.sql.tencentcdb.com:28687/zfile?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: aoping
+    password: aoping!95
   jackson:
     date-format: yyyy-MM-dd HH:mm
     time-zone: GMT+8
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: false
-    show-sql: false
+  mybatis:
+    type-aliases-package: im.zhaojun.zfile.model.entity
+    #禁用掉模板缓冲，在开发环境中可以实时的观察到html页面的更改
+  #jpa:
+    #hibernate:
+      #ddl-auto: update
+    #properties:
+      #hibernate:
+        #format_sql: false
+    #show-sql: false
   resources:
     chain:
       gzipped: true

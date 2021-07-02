@@ -1,11 +1,14 @@
+/*
 package im.zhaojun.zfile.model.enums;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+*/
 /**
  * @author zhaojun
- */
+ *//*
+
 @Converter(autoApply = true)
 public class StorageTypeEnumConvert implements AttributeConverter<StorageTypeEnum, String> {
 
@@ -19,4 +22,4 @@ public class StorageTypeEnumConvert implements AttributeConverter<StorageTypeEnu
         return StorageTypeEnum.getEnum(dbData);
     }
 
-}
+}*/

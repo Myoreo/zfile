@@ -2,18 +2,16 @@ package im.zhaojun.zfile.repository;
 
 import im.zhaojun.zfile.model.entity.DriveConfig;
 import im.zhaojun.zfile.model.enums.StorageTypeEnum;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author zhaojun
  */
-@Repository
-public interface DriverConfigRepository extends JpaRepository<DriveConfig, Integer> {
+@Mapper
+public interface DriverConfigRepository {
 
     /**
      * 根据存储策略类型获取所有驱动器
@@ -23,6 +21,7 @@ public interface DriverConfigRepository extends JpaRepository<DriveConfig, Integ
      *
      * @return  指定存储类型的驱动器
      */
+    @Select("select * from driver_config where `type`=#{type}")
     List<DriveConfig> findByType(StorageTypeEnum type);
 
 
@@ -35,9 +34,8 @@ public interface DriverConfigRepository extends JpaRepository<DriveConfig, Integ
      * @param   id
      *          驱动器 ID
      */
-    @Modifying
-    @Query(value="update DRIVER_CONFIG set orderNum = :orderNum where id = :id")
-    void updateSetOrderNumById(Integer orderNum, Integer id);
+    @Update("update driver_config set orderNum = #{orderNum} where id = #{id}")
+    void updateSetOrderNumById(@Param("orderNum") Integer orderNum,@Param("id") Integer id);
 
 
     /**
@@ -45,7 +43,7 @@ public interface DriverConfigRepository extends JpaRepository<DriveConfig, Integ
      *
      * @return  驱动器最大 ID
      */
-    @Query(nativeQuery = true, value = "select max(id) max from DRIVER_CONFIG")
+    @Select("select max(id) max from driver_config")
     Integer selectMaxId();
 
 
@@ -58,8 +56,17 @@ public interface DriverConfigRepository extends JpaRepository<DriveConfig, Integ
      * @param   newId
      *          驱动器新 ID
      */
-    @Modifying
-    @Query(value="update DRIVER_CONFIG set id = :newId where id = :updateId")
-    void updateId(Integer updateId, Integer newId);
+    @Update("update driver_config set id = #{newId} where id = #{updateId}")
+    void updateId(@Param("updaetId") Integer updateId, @Param("updateId") Integer newId);
 
+    @Select("<script> select * from drive_config <if test='enable!=null'> where enable =#{enable} </if>order by order_num</script> ")
+    List<DriveConfig> findAll(Integer enable);
+
+    @Select("select * from drive_config where id=#{id}")
+    DriveConfig findById(Integer id);
+
+    @Insert("insert into drive_config (auto_refresh_cache,default_switch_to_img_mode,enable,enable_cache,`name`,order_num,search_contain_encrypted_file,search_enable,search_ignore_case," +
+            "`type`) values(#{autoRefreshCache},#{defaultSwitchToImgMode},#{enable},#{enableCache},#{name},#{orderNum}," +
+            "#{searchContainEncryptedFile},#{searchEnable},#{searchIgnoreCase},#{type})")
+    int save(DriveConfig driveConfig);
 }

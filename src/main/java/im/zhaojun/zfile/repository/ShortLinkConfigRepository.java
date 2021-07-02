@@ -1,21 +1,19 @@
 package im.zhaojun.zfile.repository;
 
 import im.zhaojun.zfile.model.entity.ShortLinkConfig;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zhaojun
  */
-@Repository
-public interface ShortLinkConfigRepository extends JpaRepository<ShortLinkConfig, Integer>, JpaSpecificationExecutor<ShortLinkConfig> {
+@Mapper
+public interface ShortLinkConfigRepository{
 
     /**
      * 获取驱动器下的所有规则
@@ -23,20 +21,9 @@ public interface ShortLinkConfigRepository extends JpaRepository<ShortLinkConfig
      * @param       key
      *              短链 Key
      */
+    @Select("select * from short_link where `key`=#{key} ")
     ShortLinkConfig findFirstByKey(String key);
 
-    @Query(nativeQuery = true,
-            value = " select * from SHORT_LINK where " +
-                    " key like concat('%', :key,'%') " +
-                    " and url like concat('%', :url,'%') " +
-                    " and (:dateFrom is null or create_date >= :dateFrom" +
-                    " and (:dateTo is null or create_date <= :dateTo) ",
-            countQuery =  " select count(1) from SHORT_LINK where " +
-                    " key like concat('%', :key,'%') " +
-                    " and url like concat('%', :url,'%') " +
-                    " and (:dateFrom is null or create_date >= :dateFrom" +
-                    " and (:dateTo is null or create_date <= :dateTo) "
-    )
     // @Query(nativeQuery = true,
     //         value = " select * from SHORT_LINK where " +
     //                 " key like concat('%', :key,'%') " +
@@ -49,7 +36,12 @@ public interface ShortLinkConfigRepository extends JpaRepository<ShortLinkConfig
     //                 " and (:dateFrom  is null or date_format(create_date, '%Y-%m-%d') >= date_format(:dateFrom, '%Y-%m-%d'))" +
     //                 " and (:dateTo is null or date_format(create_date, '%Y-%m-%d') <= date_format(:dateTo, '%Y-%m-%d')) ) "
     // )
-    Page<ShortLinkConfig> findByPage(String key, String url, Date dateFrom, Date dateTo, Pageable pageable);
+    @Select(" select * from short_link where " +
+            " key like concat('%', #{key},'%') " +
+            " and url like concat('%', #{url},'%') " +
+            " and (#{dateFrom} is null or create_date >= #{dateFrom}" +
+            " and (#{dateTo} is null or create_date <= #{dateTo}) ")
+    List<ShortLinkConfig> findByPage(@Param("key") String key, @Param("url") String url, @Param("dateFrom") Date dateFrom, @Param("dateTo") Date dateTo);
 
     /**
      * 获取驱动器下的所有规则
@@ -57,19 +49,10 @@ public interface ShortLinkConfigRepository extends JpaRepository<ShortLinkConfig
      * @param       url
      *              短链 URL
      */
+    @Select("select * from short_link where `url`=#{url}")
     ShortLinkConfig findFirstByUrl(String url);
 
 
-    /**
-     * 更新驱动器 ID
-     *
-     * @param   updateSubPath
-     *          原路径部分名称
-     *
-     * @param   newSubPath
-     *          修改后路径部分名称
-     */
-    @Modifying
-    @Query(value="update SHORT_LINK set url = replace(url, :updateSubPath, :newSubPath)")
-    void updateUrlDriveId(String updateSubPath, String newSubPath);
+    @Update("update short_link set url = replace(url, #{updateSubPath}, #{newSubPath})")
+    void updateUrlDriveId(@Param("updateSubPath")String updateSubPath,@Param("newSubPath") String newSubPath);
 }

@@ -2,18 +2,15 @@ package im.zhaojun.zfile.repository;
 
 import im.zhaojun.zfile.model.entity.StorageConfig;
 import im.zhaojun.zfile.model.enums.StorageTypeEnum;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 /**
  * @author zhaojun
  */
-@Repository
-public interface StorageConfigRepository extends JpaRepository<StorageConfig, Integer> {
+@Mapper
+public interface StorageConfigRepository {
 
     /**
      * 根据存储类型找对应的配置信息
@@ -23,6 +20,7 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      *
      * @return  此类型所有的配置信息
      */
+    @Select("select * from storage_config where `type`=#{type}")
     List<StorageConfig> findByTypeOrderById(StorageTypeEnum type);
 
 
@@ -34,6 +32,7 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      *
      * @return  此驱动器所有的配置信息
      */
+    @Select("select * from storage_config where `driveId`=#{driveId} order by id")
     List<StorageConfig> findByDriveIdOrderById(Integer driveId);
 
 
@@ -45,6 +44,7 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      *
      * @return  此驱动器所有的配置信息
      */
+    @Select("select * from storage_config where `driveId`=#{driveId}")
     List<StorageConfig> findByDriveId(Integer driveId);
 
 
@@ -54,6 +54,7 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      * @param   driveId
      *          驱动器 ID
      */
+    @Delete("delete from storage_config where driveId=#{driveId}")
     void deleteByDriveId(Integer driveId);
 
 
@@ -68,7 +69,8 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      *
      * @return  KEY 对应的对象
      */
-    StorageConfig findByDriveIdAndKey(Integer driveId, String key);
+    @Select("select * from storage_config where driveId=#{driveId} and `key`=#{key}")
+    StorageConfig findByDriveIdAndKey(@Param("driveId") Integer driveId, @Param("key") String key);
 
 
     /**
@@ -80,8 +82,7 @@ public interface StorageConfigRepository extends JpaRepository<StorageConfig, In
      * @param   newId
      *          驱动器新 ID
      */
-    @Modifying
-    @Query(value="update STORAGE_CONFIG set driveId = :newId where driveId = :updateId")
-    void updateDriveId(Integer updateId, Integer newId);
+    @Update("update storage_config set driveId = #{newId} where driveId = #{updateId}")
+    void updateDriveId(@Param("updateId") Integer updateId,@Param("newId") Integer newId);
 
 }

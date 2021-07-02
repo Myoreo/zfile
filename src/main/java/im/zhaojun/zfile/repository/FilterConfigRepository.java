@@ -1,24 +1,22 @@
 package im.zhaojun.zfile.repository;
 
 import im.zhaojun.zfile.model.entity.FilterConfig;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 /**
  * @author zhaojun
  */
-@Repository
-public interface FilterConfigRepository extends JpaRepository<FilterConfig, Integer> {
+@Mapper
+public interface FilterConfigRepository {
 
     /**
      * 获取驱动器下的所有规则
      * @param       driveId
      *              驱动器 ID
      */
+    @Select("select * from filter_config where drive_id=#{driveId}")
     List<FilterConfig> findByDriveId(Integer driveId);
 
     /**
@@ -26,6 +24,7 @@ public interface FilterConfigRepository extends JpaRepository<FilterConfig, Inte
      * @param       driveId
      *              驱动器 ID
      */
+    @Delete("delete from filter_config where drive_id=#{driveId}")
     void deleteByDriveId(Integer driveId);
 
 
@@ -38,7 +37,6 @@ public interface FilterConfigRepository extends JpaRepository<FilterConfig, Inte
      * @param   newId
      *          驱动器新 ID
      */
-    @Modifying
-    @Query(value="update FILTER_CONFIG set driveId = :newId where driveId = :updateId")
-    void updateDriveId(Integer updateId, Integer newId);
+    @Update("update filter_config set driveId = #{newId} where driveId = #{updateId}")
+    void updateDriveId(@Param("updateId") Integer updateId, @Param("newId") Integer newId);
 }

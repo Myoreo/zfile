@@ -1,14 +1,14 @@
 package im.zhaojun.zfile.repository;
 
 import im.zhaojun.zfile.model.entity.SystemConfig;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * @author zhaojun
  */
-@Repository
-public interface SystemConfigRepository extends JpaRepository<SystemConfig, Integer> {
+@Mapper
+public interface SystemConfigRepository {
 
     /**
      * 查找系统设置中, 某个设置项对应的值
@@ -18,6 +18,7 @@ public interface SystemConfigRepository extends JpaRepository<SystemConfig, Inte
      *
      * @return  设置值
      */
+    @Select("select * from system_config where `key`=#{key}")
     SystemConfig findByKey(String key);
 
 }
